@@ -1,14 +1,11 @@
 from sqlalchemy import create_engine, func
-from sqlalchemy import ForeignKey, Table, Column, Integer, String, DateTime, MetaData
+from sqlalchemy import ForeignKey, Table, Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-# convention = {
-#     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-# }
-# metadata = MetaData(naming_convention=convention)
-engine = create_engine("sqlite:///many_to_many.db")
-Base = declarative_base(metadata=metadata)
+engine = create_engine('sqlite:///many_to_many.db')
+
+Base = declarative_base()
 
 game_user = Table(
     'game_users',
@@ -29,7 +26,6 @@ class Game(Base):
 
     users = relationship('User', secondary=game_user, back_populates='games')
     reviews = relationship('Review', backref=backref('game'), cascade='all, delete-orphan')
-    
 
     def __repr__(self):
         return f'Game(id={self.id}, ' + \
@@ -55,17 +51,15 @@ class Review(Base):
     __tablename__ = 'reviews'
 
     id = Column(Integer(), primary_key=True)
+
     score = Column(Integer())
     comment = Column(String())
-    
-    game_id = Column(Integer(), ForeignKey('games.id'))
 
+    game_id = Column(Integer(), ForeignKey('games.id'))
     user_id = Column(Integer(), ForeignKey('users.id'))
+
 
     def __repr__(self):
         return f'Review(id={self.id}, ' + \
             f'score={self.score}, ' + \
             f'game_id={self.game_id})'
-
-
-    
